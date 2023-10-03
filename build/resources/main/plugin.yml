@@ -1,0 +1,18 @@
+name: SpeedBuild
+version: '1.0-SNAPSHOT'
+main: fr.mathis_bruel.endorah.speedbuild.speedbuild.Main
+api-version: 1.20
+authors: [ Mathis_Bruel ]
+description: SpeedBuild | Plugin de test Candidature de Mathis Bruel
+website: https://endorah.net/
+commands:
+  speedbuild:
+    description: Commande principale du plugin SpeedBuild
+    usage: /speedbuild
+    aliases: [sb]
+    permission: speedbuild.use
+  adminspeedbuild:
+    description: Commande d'administration du plugin SpeedBuild
+    usage: /adminspeedbuild
+    aliases: [asb]
+    permission: speedbuild.admin
