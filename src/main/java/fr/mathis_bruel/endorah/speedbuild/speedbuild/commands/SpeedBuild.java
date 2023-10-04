@@ -16,6 +16,6 @@ public class SpeedBuild implements CommandExecutor {
         /sb forcestart -> force start the game
         /sb leaderboard -> return leaderboard
          */
-        return false;
+        return true;
     }
 }
