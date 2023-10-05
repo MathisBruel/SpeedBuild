@@ -2,6 +2,7 @@ package fr.mathis_bruel.endorah.speedbuild.speedbuild;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.commands.AdminSpeedBuild;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.commands.SpeedBuild;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.manager.Game;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -9,6 +10,7 @@ public final class Main extends JavaPlugin {
 
     private static Main instance;
     private static String PREFIX = "§7[§bSpeedBuild§7] ";
+    private static Game game;
 
     @Override
     public void onEnable() {
@@ -30,8 +32,11 @@ public final class Main extends JavaPlugin {
         Bukkit.getServer().getConsoleSender().sendMessage("§6| §bSpeedBuild §6- §7For §bEndorah");
         Bukkit.getServer().getConsoleSender().sendMessage("§6-------------------------------------");
         instance = this;
+        saveDefaultConfig();
         getCommand("speedbuild").setExecutor(new SpeedBuild());
         getCommand("adminspeedbuild").setExecutor(new AdminSpeedBuild());
+        game = new Game("SpeedBuild");
+        game.load();
 
 
     }
@@ -64,5 +69,9 @@ public final class Main extends JavaPlugin {
 
     public static String getPrefix() {
         return PREFIX;
+    }
+
+    public static Game getGame() {
+        return game;
     }
 }

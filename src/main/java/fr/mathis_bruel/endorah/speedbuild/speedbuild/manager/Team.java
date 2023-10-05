@@ -1,5 +1,8 @@
 package fr.mathis_bruel.endorah.speedbuild.speedbuild.manager;
 
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -13,24 +16,27 @@ import java.util.ArrayList;
 public class Team {
 
     private String name;
-    private Color color;
+    private ChatColor color;
     private Location spawn;
     private Location center;
     private int score;
-    private ArrayList<Player> players;
+    private Player player;
+    private Game game;
 
-    public Team(String name) {
+    public Team(String name, Game game) {
         this.name = name;
-        color = Color.WHITE;
+        color = ChatColor.WHITE;
         score = 0;
+        this.game = game;
     }
 
-    public Team(String name, Color color, Location spawn, Location center) {
+    public Team(String name, Game game, ChatColor color, Location spawn, Location center) {
         this.name = name;
         this.color = color;
         this.spawn = spawn;
         this.center = center;
         score = 0;
+        this.game = game;
     }
 
     /**
@@ -54,18 +60,18 @@ public class Team {
     /**
      * The getColor() function returns the color of an object.
      *
-     * @return The method is returning a Color object.
+     * @return The method is returning a ChatColor object.
      */
-    public Color getColor() {
+    public ChatColor getColor() {
         return color;
     }
 
     /**
      * The function sets the color of an object.
      *
-     * @param color The "color" parameter is of type "Color".
+     * @param color The "color" parameter is of type "ChatColor".
      */
-    public void setColor(Color color) {
+    public void setColor(ChatColor color) {
         this.color = color;
     }
 
@@ -122,6 +128,78 @@ public class Team {
      */
     public void setScore(int score) {
         this.score = score;
+    }
+
+    /**
+     * The function returns the player.
+     *
+     * @return The method is returning a Player object.
+     */
+    public Player getPlayer() {
+        return player;
+    }
+
+    /**
+     * The function sets the player.
+     *
+     * @param player The "player" parameter is of type "Player".
+     */
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    /**
+     * The function returns the game.
+     *
+     * @return The method is returning a Game object.
+     */
+    public Game getGame() {
+        return game;
+    }
+
+    /**
+     * The function sets the game.
+     *
+     * @param game The "game" parameter is of type "Game".
+     */
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public void save() {
+        //save into config
+        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".color")) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".color", Utils.getColorNameEn(color));
+        }
+        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".spawn")) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".spawn", Utils.parseLocToString(spawn));
+        }
+        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".center")) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".center", Utils.parseLocToString(center));
+        }
+        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".score")) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".score", score);
+        }
+    }
+
+    public void load(){
+        //load from config
+        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".color")) {
+            color = Utils.getColor(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams."+name + ".color"));
+        }
+        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".spawn")) {
+            spawn = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams."+name + ".spawn"));
+        }
+        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".center")) {
+            center = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams."+name + ".center"));
+        }
+        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".score")) {
+            score = Main.getInstance().getConfig().getInt("games." + game.getName() + ".teams."+name + ".score");
+        }
+    }
+
+    public void remove(){
+        Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name, null);
     }
 
 
