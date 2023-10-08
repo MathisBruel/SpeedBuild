@@ -1,9 +1,8 @@
-package fr.mathis_bruel.endorah.speedbuild.speedbuild.manager;
+package fr.mathis_bruel.endorah.speedbuild.speedbuild.game;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -88,7 +87,7 @@ public class Team {
      * The function sets the spawn location for an object.
      *
      * @param spawn The "spawn" parameter is of type "Location". It is used to set the spawn location for something, such
-     * as a player or an entity, in a game or application.
+     *              as a player or an entity, in a game or application.
      */
     public void setSpawn(Location spawn) {
         this.spawn = spawn;
@@ -168,41 +167,43 @@ public class Team {
 
     public void save() {
         //save into config
-        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".color")) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".color", Utils.getColorNameEn(color));
+        if (Main.getInstance().getConfig().getList("games." + game.getName() + ".teams") == null) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams", new ArrayList<>());
         }
-        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".spawn")) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".spawn", Utils.parseLocToString(spawn));
+        if (!Main.getInstance().getConfig().getList("games." + game.getName() + ".teams").contains(name)) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".color", null);
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".spawn", null);
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".center", null);
         }
-        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".center")) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".center", Utils.parseLocToString(center));
+        Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".color", Utils.getColorNameEn(color));
+        if (spawn != null) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".spawn", Utils.parseLocToString(spawn));
         }
-        if(!Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".score")) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name + ".score", score);
+        if (center != null) {
+            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".center", Utils.parseLocToString(center));
         }
+        Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".score", score);
     }
 
-    public void load(){
+    public void load() {
         //load from config
-        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".color")) {
-            color = Utils.getColor(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams."+name + ".color"));
+        if (Main.getInstance().getConfig().contains("games." + game.getName() + ".teams." + name + ".color")) {
+            color = Utils.getColor(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams." + name + ".color"));
         }
-        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".spawn")) {
-            spawn = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams."+name + ".spawn"));
+        if (Main.getInstance().getConfig().contains("games." + game.getName() + ".teams." + name + ".spawn")) {
+            spawn = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams." + name + ".spawn"));
         }
-        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".center")) {
-            center = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams."+name + ".center"));
+        if (Main.getInstance().getConfig().contains("games." + game.getName() + ".teams." + name + ".center")) {
+            center = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + game.getName() + ".teams." + name + ".center"));
         }
-        if(Main.getInstance().getConfig().contains("games." + game.getName() + ".teams."+name + ".score")) {
-            score = Main.getInstance().getConfig().getInt("games." + game.getName() + ".teams."+name + ".score");
+        if (Main.getInstance().getConfig().contains("games." + game.getName() + ".teams." + name + ".score")) {
+            score = Main.getInstance().getConfig().getInt("games." + game.getName() + ".teams." + name + ".score");
         }
     }
 
-    public void remove(){
-        Main.getInstance().getConfig().set("games." + game.getName() + ".teams."+name, null);
+    public void remove() {
+        Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name, null);
     }
-
-
 
 
 }

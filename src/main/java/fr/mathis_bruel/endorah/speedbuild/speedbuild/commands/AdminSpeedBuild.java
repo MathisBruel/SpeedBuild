@@ -1,9 +1,9 @@
 package fr.mathis_bruel.endorah.speedbuild.speedbuild.commands;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
-import fr.mathis_bruel.endorah.speedbuild.speedbuild.manager.Build;
-import fr.mathis_bruel.endorah.speedbuild.speedbuild.manager.Game;
-import fr.mathis_bruel.endorah.speedbuild.speedbuild.manager.Team;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.game.Build;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.game.Game;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.game.Team;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.CustomNBT;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.Bukkit;
@@ -126,8 +126,11 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         break;
                     }
                     case "builds": {
-                        player.sendMessage("§6§lBuilds");
-                        player.sendMessage("§e/asb builds [id] -> return list of builds or details of build (if id is set: spawn build)");
+                        Main.getGame().getBuilds().forEach(build -> {
+                            player.sendMessage("§6§l" + build.getName());
+                            player.sendMessage("§e- pos1: " + build.getPos1());
+                            player.sendMessage("§e- pos2: " + build.getPos2());
+                        });
                         break;
                     }
                     case "addbuild": {
@@ -233,23 +236,24 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         player.sendMessage(Main.getPrefix() + "§aBuild removed.");
                         break;
                     }
+
                     case "builds": {
-                        Main.getGame().getBuilds().forEach(build -> {
-                            player.sendMessage("§6§l" + build.getName());
-                            player.sendMessage("§e- pos1: " + build.getPos1());
-                            player.sendMessage("§e- pos2: " + build.getPos2());
-                        });
+                        Build build = Main.getGame().getBuildByName(args[1].toLowerCase());
+                        build.spawn(player.getLocation());
+                        player.sendMessage(Main.getPrefix() + "§aBuild spawned.");
                         break;
                     }
                     case "addbuild": {
                         ItemStack item = new ItemStack(Material.STICK);
-                        item = CustomNBT.set(item, "addbuild", true);
+                        item = CustomNBT.set(item, true, "asb");
+                        item = CustomNBT.set(item, args[1], "name");
                         ItemMeta meta = item.getItemMeta();
-                        meta.setDisplayName("§6§lAdd Build");
-                        meta.setLore(Arrays.asList("§eThis item is used to select a build.", "", "§7--------------------", "", "§eLeft click to select pos1", "§eRight click to select pos2"));
+                        meta.setDisplayName("§6§lAdd Build §f| §e" + args[1]);
+                        meta.setLore(Arrays.asList("§eThis item is used to select a build.", "", "§7--------------------", "", "§eLeft click to select pos1", "§eRight click to select pos2", "§eSneak + Right click to save build", "", "§7--------------------", "", "§eBuild: §f" + args[1]));
                         item.setItemMeta(meta);
                         player.getInventory().setItemInMainHand(item);
-                        player.sendMessage(Main.getPrefix() + "§aItem given. Left click to select pos1, right click to select pos2.");
+                        player.sendMessage(Main.getPrefix() + "§aItem given. Left click to select pos1, right click to select pos2, sneak + right click to save build.");
+                        break;
                     }
                     case "teams": {
                         Game game = Main.getGame();
@@ -383,6 +387,7 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         player.sendMessage("§e/asb setLobby [<x> <y> <z>]");
                         break;
                     }
+
                     default: {
                         player.sendMessage(helpMessage);
                         break;
@@ -434,8 +439,10 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                                     player.sendMessage(Main.getPrefix() + "§cValid colors: " + Utils.getAllColor());
                                     return true;
                                 }
-                                Main.getGame().getTeamByName(args[2].toLowerCase()).setColor(Utils.getColor(args[3]));
-                                Main.getGame().getTeamByName(args[2].toLowerCase()).save();
+                                Team team = Main.getGame().getTeamByName(args[2].toLowerCase());
+                                team.setColor(Utils.getColor(args[3]));
+                                team.save();
+
                                 player.sendMessage(Main.getPrefix() + "§aColor set to " + args[3] + ".");
                                 break;
                             }
@@ -480,45 +487,45 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
             return Arrays.asList("help", "teams", "setlobby", "setminplayers", "setmaxplayers", "setbuildtime", "setviewtime", "setroundtime", "setbaseradius");
         }
         if (args.length == 2) {
-            if(args[0].equalsIgnoreCase("addadmingame")) {
+            if (args[0].equalsIgnoreCase("addadmingame")) {
                 return Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList());
             }
-            if(args[0].equalsIgnoreCase("removeadmingame")) {
+            if (args[0].equalsIgnoreCase("removeadmingame")) {
                 return Main.getGame().getOwners().stream().map(Player::getName).collect(Collectors.toList());
             }
-            if(args[0].equalsIgnoreCase("addbuild")){
+            if (args[0].equalsIgnoreCase("addbuild")) {
                 return Arrays.asList("pos1", "pos2");
             }
-            if(args[0].equalsIgnoreCase("removebuild")){
+            if (args[0].equalsIgnoreCase("removebuild")) {
                 return Main.getGame().getBuilds().stream().map(Build::getName).collect(Collectors.toList());
             }
-            if(args[0].equalsIgnoreCase("teams")) {
+            if (args[0].equalsIgnoreCase("teams")) {
                 return Arrays.asList("create", "remove", "setcolor", "setspawn", "setcenter");
             }
-            if(args[0].equalsIgnoreCase("setlobby")) {
+            if (args[0].equalsIgnoreCase("setlobby")) {
                 return Arrays.asList("<x> <y> <z>");
             }
 
         }
-        if(args.length == 3){
-            if(args[0].equalsIgnoreCase("teams")) {
-                if(args[1].equalsIgnoreCase("remove")) {
+        if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("teams")) {
+                if (args[1].equalsIgnoreCase("remove")) {
                     return Main.getGame().getTeams().stream().map(Team::getName).collect(Collectors.toList());
                 }
-                if(args[1].equalsIgnoreCase("setcolor")) {
+                if (args[1].equalsIgnoreCase("setcolor")) {
                     return Main.getGame().getTeams().stream().map(Team::getName).collect(Collectors.toList());
                 }
-                if(args[1].equalsIgnoreCase("setspawn")) {
+                if (args[1].equalsIgnoreCase("setspawn")) {
                     return Main.getGame().getTeams().stream().map(Team::getName).collect(Collectors.toList());
                 }
-                if(args[1].equalsIgnoreCase("setcenter")) {
+                if (args[1].equalsIgnoreCase("setcenter")) {
                     return Main.getGame().getTeams().stream().map(Team::getName).collect(Collectors.toList());
                 }
             }
         }
-        if(args.length == 4){
-            if(args[0].equalsIgnoreCase("teams")) {
-                if(args[1].equalsIgnoreCase("setcolor")) {
+        if (args.length == 4) {
+            if (args[0].equalsIgnoreCase("teams")) {
+                if (args[1].equalsIgnoreCase("setcolor")) {
                     return Arrays.stream(Utils.getAllColor()).toList().stream().map(Enum::name).collect(Collectors.toList());
                 }
             }

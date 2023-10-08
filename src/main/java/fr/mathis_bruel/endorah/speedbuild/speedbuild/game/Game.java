@@ -1,4 +1,4 @@
-package fr.mathis_bruel.endorah.speedbuild.speedbuild.manager;
+package fr.mathis_bruel.endorah.speedbuild.speedbuild.game;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public class Game {
 
-    private String name;
+    private final String name;
     private int minPlayers;
     private int maxPlayers;
     private int buildTime;
@@ -24,14 +24,14 @@ public class Game {
     private int roundTime;
     private int baseRadius;
     private int buildRadius;
-    private ArrayList<Team> teams;
-    private ArrayList<Player> players;
+    private final ArrayList<Team> teams;
+    private final ArrayList<Player> players;
     private States state;
-    private ArrayList<Player> owners;
+    private final ArrayList<Player> owners;
     private Location lobby;
     private Location center;
     private boolean enable;
-    private ArrayList<Build> builds;
+    private final ArrayList<Build> builds;
 
 
     public Game(String name, int minPlayers, int maxPlayers, int buildTime, int viewTime, int roundTime, int baseRadius, int buildRadius) {
@@ -90,7 +90,7 @@ public class Game {
      * The addPlayer function adds a player to a list of players.
      *
      * @param player The parameter "player" is of type Player, which means it expects an object of the Player class to be
-     * passed as an argument when calling the addPlayer method.
+     *               passed as an argument when calling the addPlayer method.
      */
     public void addPlayer(Player player) {
         players.add(player);
@@ -254,9 +254,9 @@ public class Game {
      * The function adds a player to a list of owners.
      *
      * @param player The "player" parameter is of type "Player" and represents the player that you want to add to the list
-     * of owners.
+     *               of owners.
      */
-    public void addOwner(Player player){
+    public void addOwner(Player player) {
         owners.add(player);
     }
 
@@ -264,9 +264,9 @@ public class Game {
      * The function removes a player from a list of owners.
      *
      * @param player The "player" parameter is of type Player and represents the player that you want to remove from the
-     * list of owners.
+     *               list of owners.
      */
-    public void removeOwner(Player player){
+    public void removeOwner(Player player) {
         owners.remove(player);
     }
 
@@ -375,69 +375,36 @@ public class Game {
     }
 
 
-
-
-
     /**
      * The function saves game configuration values into a config file.
      */
-    public void save(){
+    public void save() {
         // save into config
-        if(!Main.getInstance().getConfig().contains("games." + name + ".minPlayers")){
-            Main.getInstance().getConfig().set("games." + name + ".minPlayers", minPlayers);
-        }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".maxPlayers")){
-            Main.getInstance().getConfig().set("games." + name + ".maxPlayers", maxPlayers);
-        }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".buildTime")){
-            Main.getInstance().getConfig().set("games." + name + ".buildTime", buildTime);
-        }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".viewTime")){
-            Main.getInstance().getConfig().set("games." + name + ".viewTime", viewTime);
-        }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".roundTime")){
-            Main.getInstance().getConfig().set("games." + name + ".roundTime", roundTime);
-        }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".baseRadius")){
-            Main.getInstance().getConfig().set("games." + name + ".baseRadius", baseRadius);
-        }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".buildRadius")){
-            Main.getInstance().getConfig().set("games." + name + ".buildRadius", buildRadius);
-        }
-        if(lobby != null && !Main.getInstance().getConfig().contains("games." + name + ".lobby")){
+        Main.getInstance().getConfig().set("games." + name + ".minPlayers", minPlayers);
+        Main.getInstance().getConfig().set("games." + name + ".maxPlayers", maxPlayers);
+        Main.getInstance().getConfig().set("games." + name + ".buildTime", buildTime);
+        Main.getInstance().getConfig().set("games." + name + ".viewTime", viewTime);
+        Main.getInstance().getConfig().set("games." + name + ".roundTime", roundTime);
+        Main.getInstance().getConfig().set("games." + name + ".baseRadius", baseRadius);
+        Main.getInstance().getConfig().set("games." + name + ".buildRadius", buildRadius);
+        if (lobby != null) {
             Main.getInstance().getConfig().set("games." + name + ".lobby", Utils.parseLocToString(lobby));
         }
-        if(center != null && !Main.getInstance().getConfig().contains("games." + name + ".center")){
+        if (center != null) {
             Main.getInstance().getConfig().set("games." + name + ".center", Utils.parseLocToString(center));
         }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".enable")){
-            Main.getInstance().getConfig().set("games." + name + ".enable", enable);
+        Main.getInstance().getConfig().set("games." + name + ".enable", enable);
+        ArrayList<String> uuids = new ArrayList<>();
+        for (Player player : owners) {
+            uuids.add(player.getUniqueId().toString());
         }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".owners")){
-            ArrayList<String> uuids = new ArrayList<>();
-            for(Player player : owners){
-                uuids.add(player.getUniqueId().toString());
-            }
-            Main.getInstance().getConfig().set("games." + name + ".owners", uuids);
+        Main.getInstance().getConfig().set("games." + name + ".owners", uuids);
+        this.getTeams().forEach(Team::save);
+        ArrayList<String> buildNames = new ArrayList<>();
+        for (Build build : builds) {
+            buildNames.add(build.getName());
         }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".teams")){
-            ArrayList<String> teamNames = new ArrayList<>();
-            for(Team team : teams){
-                teamNames.add(team.getName());
-            }
-            Main.getInstance().getConfig().set("games." + name + ".teams", teamNames);
-        }
-        if(!Main.getInstance().getConfig().contains("games." + name + ".builds")){
-            ArrayList<String> buildNames = new ArrayList<>();
-            for(Build build : builds){
-                buildNames.add(build.getName());
-            }
-            Main.getInstance().getConfig().set("games." + name + ".builds", buildNames);
-        }
-
-
-
-
+        Main.getInstance().getConfig().set("games." + name + ".builds", buildNames);
         Main.getInstance().saveConfig();
 
     }
@@ -445,57 +412,59 @@ public class Game {
     /**
      * The function loads game configuration values from a config file.
      */
-    public void load(){
+    public void load() {
         // load from config
-        if(Main.getInstance().getConfig().contains("games." + name + ".minPlayers")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".minPlayers")) {
             minPlayers = Main.getInstance().getConfig().getInt("games." + name + ".minPlayers");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".maxPlayers")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".maxPlayers")) {
             maxPlayers = Main.getInstance().getConfig().getInt("games." + name + ".maxPlayers");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".buildTime")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".buildTime")) {
             buildTime = Main.getInstance().getConfig().getInt("games." + name + ".buildTime");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".viewTime")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".viewTime")) {
             viewTime = Main.getInstance().getConfig().getInt("games." + name + ".viewTime");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".roundTime")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".roundTime")) {
             roundTime = Main.getInstance().getConfig().getInt("games." + name + ".roundTime");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".baseRadius")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".baseRadius")) {
             baseRadius = Main.getInstance().getConfig().getInt("games." + name + ".baseRadius");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".buildRadius")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".buildRadius")) {
             buildRadius = Main.getInstance().getConfig().getInt("games." + name + ".buildRadius");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".lobby")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".lobby")) {
             lobby = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + name + ".lobby"));
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".center")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".center")) {
             center = Utils.parseStringToLoc(Main.getInstance().getConfig().getString("games." + name + ".center"));
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".enable")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".enable")) {
             enable = Main.getInstance().getConfig().getBoolean("games." + name + ".enable");
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".owners")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".owners")) {
             ArrayList<String> uuids = (ArrayList<String>) Main.getInstance().getConfig().getStringList("games." + name + ".owners");
-            for(String uuid : uuids){
+            for (String uuid : uuids) {
                 owners.add(Bukkit.getPlayer(UUID.fromString(uuid)));
             }
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".teams")){
-            ConfigurationSection teamNames =  Main.getInstance().getConfig().getConfigurationSection("games." + name + ".teams");
+        if (Main.getInstance().getConfig().contains("games." + name + ".teams")) {
+            ConfigurationSection teamNames = Main.getInstance().getConfig().getConfigurationSection("games." + name + ".teams");
 
-            for(String teamName : teamNames.getKeys(false)){
+            for (String teamName : teamNames.getKeys(false)) {
                 Team team = new Team(teamName, this);
                 team.load();
                 teams.add(team);
             }
         }
-        if(Main.getInstance().getConfig().contains("games." + name + ".builds")){
+        if (Main.getInstance().getConfig().contains("games." + name + ".builds")) {
             ArrayList<String> buildNames = (ArrayList<String>) Main.getInstance().getConfig().getStringList("games." + name + ".builds");
-            for(String buildName : buildNames){
-                builds.add(new Build(buildName));
+            for (String buildName : buildNames) {
+                Build build = new Build(buildName);
+                build.init();
+                this.addBuild(build);
             }
         }
 

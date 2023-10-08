@@ -1,4 +1,4 @@
-package fr.mathis_bruel.endorah.speedbuild.speedbuild.manager;
+package fr.mathis_bruel.endorah.speedbuild.speedbuild.game;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.Bukkit;
@@ -7,6 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Build {
     private String name;
@@ -99,6 +101,9 @@ public class Build {
             build += block.getLocation().getBlockX() + "," + block.getLocation().getBlockY() + "," + block.getLocation().getBlockZ() + "," + block.getType().name() + ";";
         }
 
+        // remove the last character ";" of build
+        build = build.substring(build.length() - 1);
+
         // create file in builds folder content = build
         Utils.createFile("builds/" + name + ".txt", build);
 
@@ -111,6 +116,7 @@ public class Build {
         // get file content
         build = Utils.getFileContent("builds/" + name + ".txt");
         build.split(";");
+
         // parse string to blocks
         parseStringToBlocks(blocks);
     }
@@ -130,8 +136,10 @@ public class Build {
     private void parseStringToBlocks(ArrayList<Block> blocks) {
         for (String block : build.split(";")) {
             String[] blockData = block.split(",");
+            if(Material.getMaterial(blockData[3]) == null) return;
             Location location = new Location(Bukkit.getWorld("world"), Integer.parseInt(blockData[0]), Integer.parseInt(blockData[1]), Integer.parseInt(blockData[2]));
             Block b = location.getBlock();
+
             b.setType(Material.getMaterial(blockData[3]));
             this.blocks.add(b);
         }
