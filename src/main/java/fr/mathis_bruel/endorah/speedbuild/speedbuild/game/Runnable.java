@@ -2,6 +2,7 @@ package fr.mathis_bruel.endorah.speedbuild.speedbuild.game;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.manager.scoreboard.FastBoard;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -27,6 +28,7 @@ public class Runnable extends BukkitRunnable {
                             add("§r");
                             add("§7Players: §f" + game.getPlayers().size() + "§7/§f" + game.getMaxPlayers());
                             add("§r");
+                            add("§7Team: "+ Utils.getColorString(game.getTeamByPlayer(player).getColor()) + game.getTeamByPlayer(player).getName());
                             add("§7§m-----------§6§m-----------");
 
 
@@ -42,7 +44,7 @@ public class Runnable extends BukkitRunnable {
                             add("§7Players: §f" + game.getPlayers().size() + "§7/§f" + game.getMaxPlayers());
                             add("§r");
                             add("§6You are not in the game");
-                            add("§6§lSend /join to join this game");
+                            add("§6Send §l/sb join §r§6to join this game");
                             add("§7§m-----------§6§m-----------");
                         }
                     });

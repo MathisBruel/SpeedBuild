@@ -167,22 +167,12 @@ public class Team {
 
     public void save() {
         //save into config
-        if (Main.getInstance().getConfig().getList("games." + game.getName() + ".teams") == null) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams", new ArrayList<>());
-        }
-        if (!Main.getInstance().getConfig().getList("games." + game.getName() + ".teams").contains(name)) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".color", null);
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".spawn", null);
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".center", null);
-        }
-        Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".color", Utils.getColorNameEn(color));
-        if (spawn != null) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".spawn", Utils.parseLocToString(spawn));
-        }
-        if (center != null) {
-            Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".center", Utils.parseLocToString(center));
-        }
+        // games.<game>.teams.<team>...
+        Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".color", color.name());
+        if(spawn != null) Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".spawn", Utils.parseLocToString(spawn));
+        if(center != null) Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".center", Utils.parseLocToString(center));
         Main.getInstance().getConfig().set("games." + game.getName() + ".teams." + name + ".score", score);
+        Main.getInstance().saveConfig();
     }
 
     public void load() {

@@ -40,14 +40,16 @@ public class SpeedBuild implements CommandExecutor {
             case "join": {
                 Game game = Main.getGame();
                 if(game.getPlayers().size() >= game.getMaxPlayers()){
-                    sender.sendMessage("§cThe game is full");
+                    sender.sendMessage(Main.getPrefix() + "§cThe game is full");
                     return true;
                 }
                 if(game.getPlayers().contains(sender)){
-                    sender.sendMessage("§cYou are already in the game");
+                    sender.sendMessage(Main.getPrefix() + "§cYou are already in the game");
                     return true;
                 }
-                game.getPlayers().add(player);
+                game.joinPlayer(player);
+                sender.sendMessage(Main.getPrefix() + "§aYou joined the game");
+
 
                 break;
             }

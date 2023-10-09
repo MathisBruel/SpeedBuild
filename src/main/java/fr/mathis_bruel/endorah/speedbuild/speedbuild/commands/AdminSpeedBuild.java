@@ -482,7 +482,6 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        System.out.println(args.length);
         if (args.length == 1) {
             return Arrays.asList("help", "teams", "setlobby", "setminplayers", "setmaxplayers", "setbuildtime", "setviewtime", "setroundtime", "setbaseradius");
         }
@@ -525,7 +524,7 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
         }
         if (args.length == 4) {
             if (args[0].equalsIgnoreCase("teams")) {
-                if (args[1].equalsIgnoreCase("setcolor")) {
+                if (args[1].equalsIgnoreCase("setcolor") || args[1].equalsIgnoreCase("create")) {
                     return Arrays.stream(Utils.getAllColor()).toList().stream().map(Enum::name).collect(Collectors.toList());
                 }
             }

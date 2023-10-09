@@ -3,9 +3,11 @@ package fr.mathis_bruel.endorah.speedbuild.speedbuild.game;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -32,6 +34,7 @@ public class Game {
     private Location center;
     private boolean enable;
     private final ArrayList<Build> builds;
+    private Runnable runnable;
 
 
     public Game(String name, int minPlayers, int maxPlayers, int buildTime, int viewTime, int roundTime, int baseRadius, int buildRadius) {
@@ -365,10 +368,49 @@ public class Game {
         return null;
     }
 
+    public Team getTeamByPlayer(Player player){
+        for(Team team : teams){
+            if(team.getPlayer() == player){
+                return team;
+            }
+        }
+        return null;
+    }
+
     public Build getBuildByName(String name) {
         for (Build build : builds) {
             if (build.getName().equalsIgnoreCase(name)) {
                 return build;
+            }
+        }
+        return null;
+    }
+    public void joinPlayer(Player player) {
+        players.add(player);
+        player.teleport(lobby);
+        player.setGameMode(GameMode.ADVENTURE);
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        player.setExp(0);
+        player.setLevel(0);
+        player.setFireTicks(0);
+        player.setFlying(false);
+        player.setAllowFlight(false);
+        // add in team with less players
+        Team team = getTeamWithLessPlayer();
+        if (team != null) {
+            team.setPlayer(player);
+        }
+
+    }
+
+    public Team getTeamWithLessPlayer() {
+        // 1 player per team
+        for (Team team : teams) {
+            if (team.getPlayer() == null) {
+                return team;
             }
         }
         return null;
@@ -394,11 +436,11 @@ public class Game {
             Main.getInstance().getConfig().set("games." + name + ".center", Utils.parseLocToString(center));
         }
         Main.getInstance().getConfig().set("games." + name + ".enable", enable);
-        ArrayList<String> uuids = new ArrayList<>();
+        /*ArrayList<String> uuids = new ArrayList<>();
         for (Player player : owners) {
             uuids.add(player.getUniqueId().toString());
         }
-        Main.getInstance().getConfig().set("games." + name + ".owners", uuids);
+        Main.getInstance().getConfig().set("games." + name + ".owners", uuids);*/
         this.getTeams().forEach(Team::save);
         ArrayList<String> buildNames = new ArrayList<>();
         for (Build build : builds) {
@@ -467,6 +509,9 @@ public class Game {
                 this.addBuild(build);
             }
         }
+
+        this.runnable = new Runnable();
+        runnable.runTaskTimer(Main.getInstance(), 0, 20);
 
 
     }
