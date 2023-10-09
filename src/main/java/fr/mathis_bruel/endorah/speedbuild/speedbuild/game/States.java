@@ -4,5 +4,6 @@ public enum States {
     WAITING,
     STARTING,
     BUILDING,
-    ENDING
+    ENDING,
+    ENDED
 }

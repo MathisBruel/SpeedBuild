@@ -4,6 +4,7 @@ import fr.mathis_bruel.endorah.speedbuild.speedbuild.commands.AdminSpeedBuild;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.commands.SpeedBuild;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.game.Game;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.manager.ListenerManager;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.manager.scoreboard.FastBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -11,6 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public final class Main extends JavaPlugin {
 
@@ -19,6 +22,7 @@ public final class Main extends JavaPlugin {
     private static Game game;
     private static HashMap<Player, ArrayList<Location>> locations = new HashMap<>();
     private ListenerManager listenerManager;
+    private static final Map<UUID, FastBoard> boards = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -47,6 +51,10 @@ public final class Main extends JavaPlugin {
         game.load();
         this.listenerManager = new ListenerManager(this);
         this.listenerManager.registerListener();
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            FastBoard board = new FastBoard(player);
+            addBoard(player.getUniqueId(), board);
+        });
 
 
 
@@ -123,5 +131,25 @@ public final class Main extends JavaPlugin {
     }
 
 
+
+    public static  Map<UUID, FastBoard> getBoards() {
+        return boards;
+    }
+
+    public static FastBoard getBoard(UUID uuid) {
+        return boards.get(uuid);
+    }
+
+    public static void addBoard(UUID uuid, FastBoard board) {
+        boards.put(uuid, board);
+    }
+
+    public static void removeBoard(UUID uuid) {
+        boards.remove(uuid);
+    }
+
+    public static void clearBoards() {
+        boards.clear();
+    }
 
 }

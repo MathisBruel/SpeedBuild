@@ -2,6 +2,7 @@ package fr.mathis_bruel.endorah.speedbuild.speedbuild.manager;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Click;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Join;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -20,6 +21,7 @@ public class ListenerManager {
 
         // Register all listeners here
         this.listeners.add(new Click());
+        this.listeners.add(new Join());
 
 
 
