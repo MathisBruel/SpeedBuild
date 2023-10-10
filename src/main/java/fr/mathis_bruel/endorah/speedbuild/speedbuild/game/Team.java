@@ -21,12 +21,14 @@ public class Team {
     private int score;
     private Player player;
     private Game game;
+    private String prefix;
 
     public Team(String name, Game game) {
         this.name = name;
         color = ChatColor.WHITE;
         score = 0;
         this.game = game;
+        prefix = "";
     }
 
     public Team(String name, Game game, ChatColor color, Location spawn, Location center) {
@@ -36,6 +38,7 @@ public class Team {
         this.center = center;
         score = 0;
         this.game = game;
+        prefix = "§7[§" + color.getChar() + name.substring(0, 1).toUpperCase() + "§7] ";
     }
 
     /**
@@ -165,6 +168,15 @@ public class Team {
         this.game = game;
     }
 
+    /**
+     * The function returns the prefix.
+     *
+     * @return The method is returning a String object.
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
     public void save() {
         //save into config
         // games.<game>.teams.<team>...
@@ -189,6 +201,7 @@ public class Team {
         if (Main.getInstance().getConfig().contains("games." + game.getName() + ".teams." + name + ".score")) {
             score = Main.getInstance().getConfig().getInt("games." + game.getName() + ".teams." + name + ".score");
         }
+        prefix = "§7[§" + color.getChar() + name.substring(0, 1).toUpperCase() + "§7] ";
     }
 
     public void remove() {

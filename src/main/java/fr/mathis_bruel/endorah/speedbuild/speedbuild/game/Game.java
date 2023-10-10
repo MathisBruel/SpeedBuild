@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.units.qual.A;
 
@@ -35,6 +36,7 @@ public class Game {
     private boolean enable;
     private final ArrayList<Build> builds;
     private Runnable runnable;
+    private int count;
 
 
     public Game(String name, int minPlayers, int maxPlayers, int buildTime, int viewTime, int roundTime, int baseRadius, int buildRadius) {
@@ -52,6 +54,7 @@ public class Game {
         enable = false;
         builds = new ArrayList<>();
         owners = new ArrayList<>();
+        count = 10;
     }
 
     public Game(String name) {
@@ -69,6 +72,7 @@ public class Game {
         enable = false;
         builds = new ArrayList<>();
         owners = new ArrayList<>();
+        count = 10;
     }
 
     /**
@@ -359,6 +363,14 @@ public class Game {
         return builds;
     }
 
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
     public Team getTeamByName(String name) {
         for (Team team : teams) {
             if (team.getName().equalsIgnoreCase(name)) {
@@ -403,6 +415,23 @@ public class Game {
         if (team != null) {
             team.setPlayer(player);
         }
+        player.setPlayerListName(team.getPrefix() + player.getName());
+        player.setDisplayName(team.getPrefix() + player.getName());
+        player.setCustomName(team.getPrefix() + player.getName());
+        player.setCustomNameVisible(true);
+    }
+
+    public void leavePlayer(Player player) {
+        players.remove(player);
+        if(player.isOnline()) {
+            player.teleport(lobby);
+            player.setPlayerListName(player.getName());
+            player.setDisplayName(player.getName());
+        }
+        Team team = getTeamByPlayer(player);
+        if (team != null) {
+            team.setPlayer(null);
+        }
 
     }
 
@@ -414,6 +443,15 @@ public class Game {
             }
         }
         return null;
+    }
+
+    public void start(){
+        for (Team team : teams) {
+            team.getPlayer().sendMessage("§aThe game has started!");
+            team.getPlayer().sendTitle("§aThe game has started!", "§7Good luck!");
+            team.getPlayer().teleport(team.getSpawn());
+        }
+
     }
 
 

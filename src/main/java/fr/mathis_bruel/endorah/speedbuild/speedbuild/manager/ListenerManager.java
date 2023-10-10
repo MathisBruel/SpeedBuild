@@ -4,6 +4,7 @@ import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Click;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Damage;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Join;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Leave;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -24,6 +25,7 @@ public class ListenerManager {
         this.listeners.add(new Click());
         this.listeners.add(new Join());
         this.listeners.add(new Damage());
+        this.listeners.add(new Leave());
 
 
 

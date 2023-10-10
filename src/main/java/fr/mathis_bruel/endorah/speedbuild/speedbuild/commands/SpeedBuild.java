@@ -2,6 +2,7 @@ package fr.mathis_bruel.endorah.speedbuild.speedbuild.commands;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.game.Game;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.game.States;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -53,12 +54,41 @@ public class SpeedBuild implements CommandExecutor {
 
                 break;
             }
-            case "leave":
+            case "leave": {
+                Game game = Main.getGame();
+                if(!game.getPlayers().contains(sender)){
+                    sender.sendMessage(Main.getPrefix() + "§cYou are not in the game");
+                    return true;
+                }
+                game.leavePlayer(player);
+                sender.sendMessage(Main.getPrefix() + "§aYou left the game");
                 break;
-            case "start":
+            }
+            case "start": {
+                Game game = Main.getGame();
+                if(game.getPlayers().size() < game.getMinPlayers()){
+                    sender.sendMessage(Main.getPrefix() + "§cNot enough players to start the game");
+                    return true;
+                }
+                if(game.getState() != States.WAITING){
+                    sender.sendMessage(Main.getPrefix() + "§cThe game is already started");
+                    return true;
+                }
+                game.setState(States.STARTING);
+                game.setCount(10);
+                sender.sendMessage(Main.getPrefix() + "§aThe game will start in 10 seconds");
                 break;
-            case "stop":
+            }
+            case "stop": {
+                Game game = Main.getGame();
+                if(game.getState() == States.WAITING){
+                    sender.sendMessage(Main.getPrefix() + "§cThe game is not started");
+                    return true;
+                }
+                game.setState(States.WAITING);
+                sender.sendMessage(Main.getPrefix() + "§aThe game is stopped");
                 break;
+            }
             case "forcestart":
                 break;
             case "leaderboard":
