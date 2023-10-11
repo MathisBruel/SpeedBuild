@@ -79,6 +79,9 @@ public final class Main extends JavaPlugin {
         Bukkit.getServer().getConsoleSender().sendMessage("§6| §bSpeedBuild §6- §7Plugin by §bMathis Bruel");
         Bukkit.getServer().getConsoleSender().sendMessage("§6| §bSpeedBuild §6- §7For §bEndorah");
         Bukkit.getServer().getConsoleSender().sendMessage("§6-------------------------------------");
+        game.getPlayers().forEach(player -> {
+            game.leavePlayer(player);
+        });
 
     }
 

@@ -325,6 +325,16 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         player.sendMessage(Main.getPrefix() + "§aBase radius set to " + baseRadius + ".");
                         break;
                     }
+                    case "setbuildredius": {
+                        if (!Utils.isNumber(args[1])) {
+                            player.sendMessage(Main.getPrefix() + "§cThe argument must be a number.");
+                            return true;
+                        }
+                        int baseRadius = Integer.parseInt(args[1]);
+                        Main.getGame().setBuildRadius(baseRadius);
+                        player.sendMessage(Main.getPrefix() + "§aBuild radius set to " + baseRadius + ".");
+                        break;
+                    }
                     case "setlobby": {
                         player.sendMessage("§6§lSet Build Time");
                         player.sendMessage("§e/asb setLobby [<x> <y> <z>]");
@@ -483,7 +493,7 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("help", "teams", "setlobby", "setminplayers", "setmaxplayers", "setbuildtime", "setviewtime", "setroundtime", "setbaseradius");
+            return Arrays.asList("help", "teams", "setlobby", "setminplayers", "setmaxplayers", "setbuildtime", "setviewtime", "setroundtime", "setbaseradius", "setbuildradius");
         }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("addadmingame")) {

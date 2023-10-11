@@ -89,8 +89,9 @@ public class SpeedBuild implements CommandExecutor {
                 sender.sendMessage(Main.getPrefix() + "§aThe game is stopped");
                 break;
             }
-            case "forcestart":
+            case "forcestart": {
                 break;
+            }
             case "leaderboard":
                 break;
             default:

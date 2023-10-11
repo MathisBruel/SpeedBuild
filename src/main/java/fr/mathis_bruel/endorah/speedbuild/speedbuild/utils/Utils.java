@@ -1,16 +1,23 @@
 package fr.mathis_bruel.endorah.speedbuild.speedbuild.utils;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
+import net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam;
+import net.minecraft.world.scores.ScoreboardTeam;
+import net.minecraft.world.scores.ScoreboardTeamBase;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BlockIterator;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Utils {
 
@@ -441,6 +448,28 @@ public class Utils {
         }
 
         return content.toString();
+    }
+
+    public static void changePlayerPrefix(Player player, String prefix) {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Team team = scoreboard.getTeam(prefix);
+
+        if (team == null) {
+            team = scoreboard.registerNewTeam(prefix);
+        }
+
+        team.setPrefix(prefix);
+        team.addEntry(player.getName());
+
+    }
+
+    public static void resetPlayerPrefix(Player player){
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Team team = scoreboard.getTeam(player.getName());
+
+        if (team != null) {
+            team.unregister();
+        }
     }
 }
 

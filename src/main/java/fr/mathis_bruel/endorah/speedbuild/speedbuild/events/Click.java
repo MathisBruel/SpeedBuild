@@ -19,6 +19,7 @@ public class Click implements org.bukkit.event.Listener {
         if (event.getItem().getItemMeta() == null) return;
         if (event.getItem().getItemMeta().getDisplayName() == null) return;
         ItemStack item = event.getItem();
+        if(!CustomNBT.contains(item)) return;
         if(CustomNBT.contains(item, "asb")){
             event.setCancelled(true);
             if(Main.getLocations().get(event.getPlayer()) == null) Main.getLocations().put(event.getPlayer(), new java.util.ArrayList<Location>(Arrays.asList(null, null)));

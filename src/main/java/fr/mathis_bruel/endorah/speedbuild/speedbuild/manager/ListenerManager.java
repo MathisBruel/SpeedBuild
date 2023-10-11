@@ -1,10 +1,7 @@
 package fr.mathis_bruel.endorah.speedbuild.speedbuild.manager;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
-import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Click;
-import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Damage;
-import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Join;
-import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.Leave;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.events.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
@@ -26,6 +23,9 @@ public class ListenerManager {
         this.listeners.add(new Join());
         this.listeners.add(new Damage());
         this.listeners.add(new Leave());
+        this.listeners.add(new Block());
+        this.listeners.add(new Chat());
+        this.listeners.add(new Move());
 
 
 

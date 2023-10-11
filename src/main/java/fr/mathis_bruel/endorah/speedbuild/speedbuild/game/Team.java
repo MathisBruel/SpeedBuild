@@ -4,6 +4,7 @@ import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class Team {
     private Player player;
     private Game game;
     private String prefix;
+    private ArrayList<Block> blockPlaced = new ArrayList<>();
+    private Status status = Status.NOTPARTICIPATING;
 
     public Team(String name, Game game) {
         this.name = name;
@@ -177,6 +180,46 @@ public class Team {
         return prefix;
     }
 
+    public ArrayList<Block> getBlockPlaced() {
+        return blockPlaced;
+    }
+
+    public void addBlockPlaced(Block block) {
+        blockPlaced.add(block);
+    }
+
+    public void removeBlockPlaced(Block block) {
+        blockPlaced.remove(block);
+    }
+
+    public void clearBlockPlaced() {
+        blockPlaced.clear();
+    }
+
+    public boolean isBlockPlaced(Block block) {
+        return blockPlaced.contains(block);
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void addScore(int score) {
+        this.score += score;
+    }
+
+    public void removeScore(int score) {
+        this.score -= score;
+    }
+
+    public void resetScore() {
+        score = 0;
+    }
+
     public void save() {
         //save into config
         // games.<game>.teams.<team>...
@@ -210,3 +253,4 @@ public class Team {
 
 
 }
+

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -380,9 +381,9 @@ public class Game {
         return null;
     }
 
-    public Team getTeamByPlayer(Player player){
-        for(Team team : teams){
-            if(team.getPlayer() == player){
+    public Team getTeamByPlayer(Player player) {
+        for (Team team : teams) {
+            if (team.getPlayer() == player) {
                 return team;
             }
         }
@@ -397,6 +398,7 @@ public class Game {
         }
         return null;
     }
+
     public void joinPlayer(Player player) {
         players.add(player);
         player.teleport(lobby);
@@ -419,15 +421,17 @@ public class Game {
         player.setDisplayName(team.getPrefix() + player.getName());
         player.setCustomName(team.getPrefix() + player.getName());
         player.setCustomNameVisible(true);
+        Utils.changePlayerPrefix(player, team.getPrefix() + player.getName());
     }
 
     public void leavePlayer(Player player) {
         players.remove(player);
-        if(player.isOnline()) {
+        if (player.isOnline()) {
             player.teleport(lobby);
             player.setPlayerListName(player.getName());
             player.setDisplayName(player.getName());
         }
+        Utils.resetPlayerPrefix(player);
         Team team = getTeamByPlayer(player);
         if (team != null) {
             team.setPlayer(null);
@@ -445,13 +449,59 @@ public class Game {
         return null;
     }
 
-    public void start(){
+    public void start() {
         for (Team team : teams) {
+            if(team.getPlayer() == null) {
+                team.setStatus(Status.NOTPARTICIPATING);
+                return;
+            }
+            team.setStatus(Status.PARTICIPATING);
             team.getPlayer().sendMessage("§aThe game has started!");
             team.getPlayer().sendTitle("§aThe game has started!", "§7Good luck!");
             team.getPlayer().teleport(team.getSpawn());
         }
 
+    }
+
+    public void spawnBuild() {
+        // decompte de 3 secondes
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), new Runnable() {
+            final int i = 3;
+
+            @Override
+            public void run() {
+                if (i != 0) {
+                    if (i == 3) {
+                        for (Team team : teams) {
+                            team.getPlayer().sendMessage("§aThe build spawn in 3 seconds!");
+                            team.getPlayer().sendTitle("§6❸", "§aThe build spawn in 3 seconds!");
+                        }
+                    }
+                    if (i == 2) {
+                        for (Team team : teams) {
+                            team.getPlayer().sendMessage("§aThe build spawn in 2 seconds!");
+                            team.getPlayer().sendTitle("§6❷", "§aThe build spawn in 2 seconds!");
+                        }
+                    }
+                    if (i == 1) {
+                        for (Team team : teams) {
+                            team.getPlayer().sendMessage("§aThe build spawn in 1 seconds!");
+                            team.getPlayer().sendTitle("§6❶", "§aThe build spawn in 1 seconds!");
+                        }
+                    }
+                } else {
+                    Build build = builds.get(new Random().nextInt(builds.size()));
+                    for (Team team : teams) {
+                        team.getPlayer().sendMessage("§aThe build has spawned!");
+                        build.spawn(team.getCenter());
+
+                    }
+
+
+                    this.cancel();
+                }
+            }
+        }, 20);
     }
 
 
