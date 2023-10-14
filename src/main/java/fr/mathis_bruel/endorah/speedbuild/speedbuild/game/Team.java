@@ -220,6 +220,7 @@ public class Team {
         score = 0;
     }
 
+
     public void save() {
         //save into config
         // games.<game>.teams.<team>...

@@ -450,26 +450,26 @@ public class Utils {
         return content.toString();
     }
 
-    public static void changePlayerPrefix(Player player, String prefix) {
+    public static void changePlayerPrefix(Player player, fr.mathis_bruel.endorah.speedbuild.speedbuild.game.Team t) {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        Team team = scoreboard.getTeam(prefix);
+        Team team = scoreboard.getTeam(t.getName());
 
         if (team == null) {
-            team = scoreboard.registerNewTeam(prefix);
+            team = scoreboard.registerNewTeam(t.getName());
         }
 
-        team.setPrefix(prefix);
+        team.setPrefix(t.getPrefix());
         team.addEntry(player.getName());
-
     }
 
-    public static void resetPlayerPrefix(Player player){
+    public static void resetPlayerPrefix(Player player, fr.mathis_bruel.endorah.speedbuild.speedbuild.game.Team t){
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        Team team = scoreboard.getTeam(player.getName());
+        Team team = scoreboard.getTeam(t.getName());
 
         if (team != null) {
-            team.unregister();
+            team.removeEntry(player.getName());
         }
     }
+
 }
 

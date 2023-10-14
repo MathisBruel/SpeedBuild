@@ -4,6 +4,7 @@ public enum States {
     WAITING,
     STARTING,
     RUNNING,
+    VIEWBUILD,
     BUILDING,
     ENDING,
     ENDED

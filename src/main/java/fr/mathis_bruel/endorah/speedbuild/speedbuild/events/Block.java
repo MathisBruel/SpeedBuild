@@ -18,6 +18,12 @@ public class Block implements Listener {
         if(game.getState() != States.WAITING && game.getState() != States.STARTING){
             Team team = game.getTeamByPlayer(event.getPlayer());
             if(team != null) if(!team.isBlockPlaced(event.getBlock())) event.setCancelled(true);
+        }else {
+            if (game.getState() == States.VIEWBUILD) {
+                Team team = game.getTeamByPlayer(event.getPlayer());
+                if (team != null) event.setCancelled(true);
+
+            }
         }
     }
 
@@ -33,6 +39,12 @@ public class Block implements Listener {
                 }else{
                     team.addBlockPlaced(event.getBlock());
                 }
+            }
+        }else {
+            if (game.getState() == States.VIEWBUILD) {
+                Team team = game.getTeamByPlayer(event.getPlayer());
+                if (team != null) event.setCancelled(true);
+
             }
         }
     }

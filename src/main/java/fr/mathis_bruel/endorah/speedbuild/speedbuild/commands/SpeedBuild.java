@@ -92,6 +92,9 @@ public class SpeedBuild implements CommandExecutor {
             case "forcestart": {
                 break;
             }
+            case "test": {
+                Main.getGame().getBuilds().get(0).spawn(player.getLocation());
+            }
             case "leaderboard":
                 break;
             default:

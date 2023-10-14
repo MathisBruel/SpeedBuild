@@ -31,7 +31,6 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
         /asb setLobby [<x> <y> <z>] -> set lobby position
         /asb setMinPlayers <number> -> set min players for start game
         /asb setMaxPlayers <number> -> set max players for start game
-        /asb setBuildTime <number> -> set build time
         /asb setViewTime <number> -> set view time
         /asb setRoundTime <number> -> set round time
         /asb addBuild <name> -> give a stick to player for select a build
@@ -67,7 +66,6 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                 "§e/asb setLobby [<x> <y> <z>] -> set lobby position\n" +
                 "§e/asb setMinPlayers <number> -> set min players for start game\n" +
                 "§e/asb setMaxPlayers <number> -> set max players for start game\n" +
-                "§e/asb setBuildTime <number> -> set build time\n" +
                 "§e/asb setViewTime <number> -> set view time\n" +
                 "§e/asb setRoundTime <number> -> set round time\n" +
                 "§e/asb addBuild <name> -> give a stick to player for select a build\n" +
@@ -127,15 +125,13 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                     }
                     case "builds": {
                         Main.getGame().getBuilds().forEach(build -> {
-                            player.sendMessage("§6§l" + build.getName());
-                            player.sendMessage("§e- pos1: " + build.getPos1());
-                            player.sendMessage("§e- pos2: " + build.getPos2());
+                            player.sendMessage("§6§l- " + build.getName());
                         });
                         break;
                     }
                     case "addbuild": {
                         player.sendMessage("§6§lAdd Build");
-                        player.sendMessage("§e/asb addBuild <name> -> give a stick to player for select a build");
+                        player.sendMessage("§e/asb addBuild <name> <timeBuild> -> give a stick to player for select a build");
                         player.sendMessage("§e- pos1 -> select pos1");
                         player.sendMessage("§e- pos2 -> select pos2");
                         break;
@@ -155,19 +151,9 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         player.sendMessage("§e/asb setMaxPlayers <number> -> set max players for start game");
                         break;
                     }
-                    case "setbuildtime": {
-                        player.sendMessage("§6§lSet Build Time");
-                        player.sendMessage("§e/asb setBuildTime <number> -> set build time");
-                        break;
-                    }
                     case "setviewtime": {
                         player.sendMessage("§6§lSet View Time");
                         player.sendMessage("§e/asb setViewTime <number> -> set view time");
-                        break;
-                    }
-                    case "setroundtime": {
-                        player.sendMessage("§6§lSet Round Time");
-                        player.sendMessage("§e/asb setRoundTime <number> -> set round time");
                         break;
                     }
                     case "setbaseradius": {
@@ -243,16 +229,12 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         player.sendMessage(Main.getPrefix() + "§aBuild spawned.");
                         break;
                     }
+
                     case "addbuild": {
-                        ItemStack item = new ItemStack(Material.STICK);
-                        item = CustomNBT.set(item, true, "asb");
-                        item = CustomNBT.set(item, args[1], "name");
-                        ItemMeta meta = item.getItemMeta();
-                        meta.setDisplayName("§6§lAdd Build §f| §e" + args[1]);
-                        meta.setLore(Arrays.asList("§eThis item is used to select a build.", "", "§7--------------------", "", "§eLeft click to select pos1", "§eRight click to select pos2", "§eSneak + Right click to save build", "", "§7--------------------", "", "§eBuild: §f" + args[1]));
-                        item.setItemMeta(meta);
-                        player.getInventory().setItemInMainHand(item);
-                        player.sendMessage(Main.getPrefix() + "§aItem given. Left click to select pos1, right click to select pos2, sneak + right click to save build.");
+                        player.sendMessage("§6§lAdd Build");
+                        player.sendMessage("§e/asb addBuild <name> <timeBuild> -> give a stick to player for select a build");
+                        player.sendMessage("§e- pos1 -> select pos1");
+                        player.sendMessage("§e- pos2 -> select pos2");
                         break;
                     }
                     case "teams": {
@@ -285,16 +267,6 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         player.sendMessage(Main.getPrefix() + "§aMax players set to " + maxPlayers + ".");
                         break;
                     }
-                    case "setbuildtime": {
-                        if (!Utils.isNumber(args[1])) {
-                            player.sendMessage(Main.getPrefix() + "§cThe argument must be a number.");
-                            return true;
-                        }
-                        int buildTime = Integer.parseInt(args[1]);
-                        Main.getGame().setBuildTime(buildTime);
-                        player.sendMessage(Main.getPrefix() + "§aBuild time set to " + buildTime + ".");
-                        break;
-                    }
                     case "setviewtime": {
                         if (!Utils.isNumber(args[1])) {
                             player.sendMessage(Main.getPrefix() + "§cThe argument must be a number.");
@@ -303,16 +275,6 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                         int viewTime = Integer.parseInt(args[1]);
                         Main.getGame().setViewTime(viewTime);
                         player.sendMessage(Main.getPrefix() + "§aView time set to " + viewTime + ".");
-                        break;
-                    }
-                    case "setroundtime": {
-                        if (!Utils.isNumber(args[1])) {
-                            player.sendMessage(Main.getPrefix() + "§cThe argument must be a number.");
-                            return true;
-                        }
-                        int roundTime = Integer.parseInt(args[1]);
-                        Main.getGame().setRoundTime(roundTime);
-                        player.sendMessage(Main.getPrefix() + "§aRound time set to " + roundTime + ".");
                         break;
                     }
                     case "setbaseradius": {
@@ -390,6 +352,24 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
                                 break;
                             }
                         }
+                        break;
+                    }
+
+                    case "addbuild": {
+                        if (!Utils.isNumber(args[2])){
+                            player.sendMessage(Main.getPrefix() + "§cThe second argument must be a number.");
+                            return true;
+                        }
+                        ItemStack item = new ItemStack(Material.STICK);
+                        item = CustomNBT.set(item, true, "asb");
+                        item = CustomNBT.set(item, args[1], "name");
+                        item = CustomNBT.set(item, args[2], "time");
+                        ItemMeta meta = item.getItemMeta();
+                        meta.setDisplayName("§6§lAdd Build §f| §e" + args[1]);
+                        meta.setLore(Arrays.asList("§eThis item is used to select a build.", "", "§7--------------------", "", "§eLeft click to select pos1", "§eRight click to select pos2", "§eSneak + Right click to save build", "", "§7--------------------", "", "§eBuild: §f" + args[1]));
+                        item.setItemMeta(meta);
+                        player.getInventory().setItemInMainHand(item);
+                        player.sendMessage(Main.getPrefix() + "§aItem given. Left click to select pos1, right click to select pos2, sneak + right click to save build.");
                         break;
                     }
                     case "setlobby": {
@@ -493,7 +473,7 @@ public class AdminSpeedBuild implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("help", "teams", "setlobby", "setminplayers", "setmaxplayers", "setbuildtime", "setviewtime", "setroundtime", "setbaseradius", "setbuildradius");
+            return Arrays.asList("help", "teams", "setlobby", "setminplayers", "setmaxplayers", "setviewtime", "setroundtime", "setbaseradius", "setbuildradius");
         }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("addadmingame")) {

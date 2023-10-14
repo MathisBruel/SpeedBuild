@@ -35,11 +35,12 @@ public class Click implements org.bukkit.event.Listener {
                 // right click
                 if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     if(event.getPlayer().isSneaking()){
-                        Build build = new Build(CustomNBT.getString(item, "name"), Main.getLocations().get(event.getPlayer()).get(0), Main.getLocations().get(event.getPlayer()).get(1), Main.getGame());
+                        Build build = new Build(CustomNBT.getString(item, "name"), Main.getLocations().get(event.getPlayer()).get(0), Main.getLocations().get(event.getPlayer()).get(1),CustomNBT.getInt(item, "time"),  Main.getGame());
                         build.save();
                         Main.getGame().addBuild(build);
                         Main.getGame().save();
                         event.getPlayer().sendMessage(Main.getPrefix()+"§aBuild saved.");
+                        event.getPlayer().getInventory().setItemInMainHand(null);
                         return;
                     }
                     Main.getLocations().get(event.getPlayer()).set(1, event.getClickedBlock().getLocation());

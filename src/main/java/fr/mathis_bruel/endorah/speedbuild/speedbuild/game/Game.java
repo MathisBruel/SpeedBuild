@@ -5,9 +5,12 @@ import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
@@ -23,7 +26,6 @@ public class Game {
     private final String name;
     private int minPlayers;
     private int maxPlayers;
-    private int buildTime;
     private int viewTime;
     private int roundTime;
     private int baseRadius;
@@ -38,13 +40,16 @@ public class Game {
     private final ArrayList<Build> builds;
     private Runnable runnable;
     private int count;
+    private int round;
+    private int timer;
+    private ArrayList<ArrayList<Block>> blocksToRemove = new ArrayList<>();
+    private Build currentBuild;
 
 
-    public Game(String name, int minPlayers, int maxPlayers, int buildTime, int viewTime, int roundTime, int baseRadius, int buildRadius) {
+    public Game(String name, int minPlayers, int maxPlayers, int viewTime, int roundTime, int baseRadius, int buildRadius) {
         this.name = name;
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
-        this.buildTime = buildTime;
         this.viewTime = viewTime;
         this.roundTime = roundTime;
         this.baseRadius = baseRadius;
@@ -56,14 +61,15 @@ public class Game {
         builds = new ArrayList<>();
         owners = new ArrayList<>();
         count = 10;
+        round = 1;
+        timer = 0;
     }
 
     public Game(String name) {
         this.name = name;
         this.minPlayers = 2;
         this.maxPlayers = 8;
-        this.buildTime = 300;
-        this.viewTime = 30;
+        this.viewTime = 10;
         this.roundTime = 3;
         this.baseRadius = 10;
         this.buildRadius = 5;
@@ -74,6 +80,8 @@ public class Game {
         builds = new ArrayList<>();
         owners = new ArrayList<>();
         count = 10;
+        round = 1;
+        timer = 0;
     }
 
     /**
@@ -155,19 +163,6 @@ public class Game {
 
     public void setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
-    }
-
-    /**
-     * The function returns the build time.
-     *
-     * @return The method is returning the value of the variable "buildTime".
-     */
-    public int getBuildTime() {
-        return buildTime;
-    }
-
-    public void setBuildTime(int buildTime) {
-        this.buildTime = buildTime;
     }
 
     /**
@@ -372,6 +367,72 @@ public class Game {
         return count;
     }
 
+    public int getRound() {
+        return round;
+    }
+
+    public void setRound(int round) {
+        this.round = round;
+    }
+
+    public void incrementRound() {
+        round++;
+    }
+
+    public void decrementRound() {
+        round--;
+    }
+
+    public int getTimer() {
+        return timer;
+    }
+
+    public void setTimer(int timer) {
+        this.timer = timer;
+    }
+
+    public void incrementTimer() {
+        timer++;
+    }
+
+    public void decrementTimer() {
+        timer--;
+    }
+
+    public ArrayList<ArrayList<Block>> getBlocksToRemove() {
+        return blocksToRemove;
+    }
+
+    public void setBlocksToRemove(ArrayList<ArrayList<Block>> blocksToRemove) {
+        this.blocksToRemove = blocksToRemove;
+    }
+
+    public void addBlocksToRemove(ArrayList<Block> blocks) {
+        blocksToRemove.add(blocks);
+    }
+
+    public void removeBlocksToRemove(ArrayList<Block> blocks) {
+        blocksToRemove.remove(blocks);
+    }
+
+    public void clearBlocksToRemove() {
+        blocksToRemove.forEach(blocks -> blocks.forEach(block -> block.setType(Material.AIR)));
+        blocksToRemove.clear();
+    }
+
+    public Build getCurrentBuild() {
+        return currentBuild;
+    }
+
+    public void setCurrentBuild(Build build) {
+        currentBuild = build;
+    }
+
+    public void clearCurrentBuild() {
+        currentBuild = null;
+    }
+
+
     public Team getTeamByName(String name) {
         for (Team team : teams) {
             if (team.getName().equalsIgnoreCase(name)) {
@@ -399,7 +460,20 @@ public class Game {
         return null;
     }
 
+    public void sendPlayers(String message) {
+        for (Player player : players) {
+            player.sendMessage(message);
+        }
+    }
+
+
     public void joinPlayer(Player player) {
+        // add in team with less players
+        Team team = getTeamWithLessPlayer();
+        if (team != null) {
+            team.setPlayer(player);
+
+        }
         players.add(player);
         player.teleport(lobby);
         player.setGameMode(GameMode.ADVENTURE);
@@ -412,16 +486,12 @@ public class Game {
         player.setFireTicks(0);
         player.setFlying(false);
         player.setAllowFlight(false);
-        // add in team with less players
-        Team team = getTeamWithLessPlayer();
-        if (team != null) {
-            team.setPlayer(player);
-        }
+
         player.setPlayerListName(team.getPrefix() + player.getName());
         player.setDisplayName(team.getPrefix() + player.getName());
         player.setCustomName(team.getPrefix() + player.getName());
         player.setCustomNameVisible(true);
-        Utils.changePlayerPrefix(player, team.getPrefix() + player.getName());
+        Utils.changePlayerPrefix(player, team);
     }
 
     public void leavePlayer(Player player) {
@@ -431,8 +501,8 @@ public class Game {
             player.setPlayerListName(player.getName());
             player.setDisplayName(player.getName());
         }
-        Utils.resetPlayerPrefix(player);
         Team team = getTeamByPlayer(player);
+        Utils.resetPlayerPrefix(player, team);
         if (team != null) {
             team.setPlayer(null);
         }
@@ -451,7 +521,7 @@ public class Game {
 
     public void start() {
         for (Team team : teams) {
-            if(team.getPlayer() == null) {
+            if (team.getPlayer() == null) {
                 team.setStatus(Status.NOTPARTICIPATING);
                 return;
             }
@@ -463,47 +533,19 @@ public class Game {
 
     }
 
-    public void spawnBuild() {
-        // decompte de 3 secondes
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), new Runnable() {
-            final int i = 3;
-
-            @Override
-            public void run() {
-                if (i != 0) {
-                    if (i == 3) {
-                        for (Team team : teams) {
-                            team.getPlayer().sendMessage("§aThe build spawn in 3 seconds!");
-                            team.getPlayer().sendTitle("§6❸", "§aThe build spawn in 3 seconds!");
-                        }
-                    }
-                    if (i == 2) {
-                        for (Team team : teams) {
-                            team.getPlayer().sendMessage("§aThe build spawn in 2 seconds!");
-                            team.getPlayer().sendTitle("§6❷", "§aThe build spawn in 2 seconds!");
-                        }
-                    }
-                    if (i == 1) {
-                        for (Team team : teams) {
-                            team.getPlayer().sendMessage("§aThe build spawn in 1 seconds!");
-                            team.getPlayer().sendTitle("§6❶", "§aThe build spawn in 1 seconds!");
-                        }
-                    }
-                } else {
-                    Build build = builds.get(new Random().nextInt(builds.size()));
-                    for (Team team : teams) {
-                        team.getPlayer().sendMessage("§aThe build has spawned!");
-                        build.spawn(team.getCenter());
-
-                    }
-
-
-                    this.cancel();
-                }
-            }
-        }, 20);
+    public void giveItems(){
+        this.getPlayers().forEach(p -> {
+            this.getCurrentBuild().getBlocks().forEach((loc, mat)->{
+                p.getInventory().addItem(new ItemStack(mat));
+            });
+        });
     }
 
+    public void setGamemode(GameMode gamemode){
+        this.getPlayers().forEach(p -> {
+            p.setGameMode(gamemode);
+        });
+    }
 
     /**
      * The function saves game configuration values into a config file.
@@ -512,7 +554,6 @@ public class Game {
         // save into config
         Main.getInstance().getConfig().set("games." + name + ".minPlayers", minPlayers);
         Main.getInstance().getConfig().set("games." + name + ".maxPlayers", maxPlayers);
-        Main.getInstance().getConfig().set("games." + name + ".buildTime", buildTime);
         Main.getInstance().getConfig().set("games." + name + ".viewTime", viewTime);
         Main.getInstance().getConfig().set("games." + name + ".roundTime", roundTime);
         Main.getInstance().getConfig().set("games." + name + ".baseRadius", baseRadius);
@@ -549,9 +590,6 @@ public class Game {
         }
         if (Main.getInstance().getConfig().contains("games." + name + ".maxPlayers")) {
             maxPlayers = Main.getInstance().getConfig().getInt("games." + name + ".maxPlayers");
-        }
-        if (Main.getInstance().getConfig().contains("games." + name + ".buildTime")) {
-            buildTime = Main.getInstance().getConfig().getInt("games." + name + ".buildTime");
         }
         if (Main.getInstance().getConfig().contains("games." + name + ".viewTime")) {
             viewTime = Main.getInstance().getConfig().getInt("games." + name + ".viewTime");
