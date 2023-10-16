@@ -42,6 +42,7 @@ public class Runnable extends BukkitRunnable {
                 game.sendPlayers("§7You have §f" + game.getCurrentBuild().getBuildTime() + "§7 seconds to build the build");
                 game.giveItems();
                 viewTime = Main.getGame().getViewTime();
+                game.startChronos();
 
             }else{
                 game.sendPlayers("§7You only have §f" + viewTime + "§7 seconds left to watch the build");

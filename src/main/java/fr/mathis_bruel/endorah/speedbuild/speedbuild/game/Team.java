@@ -1,6 +1,7 @@
 package fr.mathis_bruel.endorah.speedbuild.speedbuild.game;
 
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.Main;
+import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.DecimalChrono;
 import fr.mathis_bruel.endorah.speedbuild.speedbuild.utils.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,6 +26,7 @@ public class Team {
     private String prefix;
     private ArrayList<Block> blockPlaced = new ArrayList<>();
     private Status status = Status.NOTPARTICIPATING;
+    private DecimalChrono chrono = new DecimalChrono();
 
     public Team(String name, Game game) {
         this.name = name;
@@ -219,6 +221,27 @@ public class Team {
     public void resetScore() {
         score = 0;
     }
+
+    public DecimalChrono getChrono() {
+        return chrono;
+    }
+
+    public void setChrono(DecimalChrono chrono) {
+        this.chrono = chrono;
+    }
+
+    public void startChrono() {
+        chrono.start();
+    }
+
+    public void stopChrono() {
+        chrono.stop();
+    }
+
+    public void resetChrono() {
+        chrono.reset();
+    }
+
 
 
     public void save() {

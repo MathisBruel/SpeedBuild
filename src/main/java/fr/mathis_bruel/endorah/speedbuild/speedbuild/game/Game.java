@@ -547,6 +547,13 @@ public class Game {
         });
     }
 
+    public void startChronos(){
+        this.getTeams().forEach(team ->{
+            team.getChrono().setPlayer(team.getPlayer());
+            team.startChrono();
+        });
+    }
+
     /**
      * The function saves game configuration values into a config file.
      */
